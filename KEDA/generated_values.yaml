@@ -1,0 +1,14 @@
+globalConfig:
+  signing_key: ab556adf-9f38-4c02-8a68-e1c921530e29
+  account_id: 0c476cee-e236-434f-a02d-17f06259d34b
+sinksConfig:
+- robusta_sink:
+    name: robusta_ui_sink
+    token: eyJhY2NvdW50X2lkIjogIjBjNDc2Y2VlLWUyMzYtNDM0Zi1hMDJkLTE3ZjA2MjU5ZDM0YiIsICJhcGlfa2V5IjogImV5SmhiR2NpT2lKSVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUp5YjJ4bElqb2lZVzV2YmlJc0ltbGhkQ0k2TVRZeU5ERTNNalF5TkN3aVpYaHdJam94T1RNNU56UTROREkwZlEuaFJMdjZQQW54MWNhdkR3bC1pWXlnQXJINHFBMERWSFluckQ3MUFzcXFQdyIsICJzdG9yZV91cmwiOiAiaHR0cHM6Ly94dnlocG94Zm10cHVxcWV5cWtzby5zdXBhYmFzZS5jbyIsICJlbWFpbCI6ICJhcGl1c2VyLURhdGFldmVyLUNvbnN1bHRpbmctMS03ODYxMTRAcm9idXN0YS5kZXYiLCAicGFzc3dvcmQiOiAiOGUyYmVhMzEtNjRhOC00ZDg3LWFhZDYtNTE5NThmM2NlMzY0In0=
+- slack_sink:
+    name: main_slack_sink
+    slack_channel: lab-2-ci-cd-dev-ops
+    api_key: xoxb-1319850418865-8595982139473-FypJFEua7M43vMr7eyzvSaXj
+enablePlatformPlaybooks: true
+runner:
+  sendAdditionalTelemetry: false

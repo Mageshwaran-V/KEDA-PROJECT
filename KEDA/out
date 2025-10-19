@@ -1,0 +1,58 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"name":"devops-toolkit","namespace":"production"},"spec":{"cooldownPeriod":30,"maxReplicaCount":10,"minReplicaCount":1,"pollingInterval":5,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"devops-toolkit"},"triggers":[{"metadata":{"metricName":"traefik_service_requests_total","query":"max(irate(traefik_service_requests_total{service=\"production-devops-toolkit-80@kubernetes\"}[5m]))","serverAddress":"http://prometheus-prometheus-kube-prometheus-prometheus.monitoring","threshold":"10"},"type":"prometheus"}]}}
+  creationTimestamp: "2025-03-11T16:31:06Z"
+  finalizers:
+  - finalizer.keda.sh
+  generation: 2
+  labels:
+    scaledobject.keda.sh/name: devops-toolkit
+  name: devops-toolkit
+  namespace: production
+  resourceVersion: "1225329"
+  uid: 6913beaa-e3c9-4beb-b852-352f63c5afa3
+spec:
+  cooldownPeriod: 30
+  maxReplicaCount: 10
+  minReplicaCount: 1
+  pollingInterval: 5
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: devops-toolkit
+  triggers:
+  - metadata:
+      metricName: traefik_service_requests_total
+      query: max(irate(traefik_service_requests_total{service="production-devops-toolkit-80@kubernetes"}[5m]))
+      serverAddress: http://prometheus-prometheus-kube-prometheus-prometheus.monitoring
+      threshold: "10"
+    type: prometheus
+status:
+  conditions:
+  - message: Triggers defined in ScaledObject are not working correctly
+    reason: TriggerError
+    status: "False"
+    type: Ready
+  - message: Scaling is not performed because triggers are not active
+    reason: ScalerNotActive
+    status: "False"
+    type: Active
+  - message: No fallbacks are active on this scaled object
+    reason: NoFallbackFound
+    status: "False"
+    type: Fallback
+  - status: Unknown
+    type: Paused
+  externalMetricNames:
+  - s0-prometheus
+  hpaName: keda-hpa-devops-toolkit
+  originalReplicaCount: 1
+  scaleTargetGVKR:
+    group: apps
+    kind: Deployment
+    resource: deployments
+    version: v1
+  scaleTargetKind: apps/v1.Deployment
