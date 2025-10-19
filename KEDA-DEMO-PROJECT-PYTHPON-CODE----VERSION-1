@@ -1,0 +1,116 @@
+1. deployment.yaml 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compute-4-app
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: compute-4-app
+  template:
+    metadata:
+      labels:
+        app: compute-4-app
+    spec:
+      containers:
+      - name: compute-container
+        image: tcesancr.azurecr.io/mycomputeservice:v4
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: compute-4-service
+spec:
+  selector:
+    app: compute-4-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer
+  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  2. app.py 
+  
+  
+from flask import Flask, request, jsonify
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+
+# Load the saved LSTM model
+model = load_model("lstm_model.keras")  # Ensure 'lstm_model' folder exists
+
+# Initialize Flask app
+app = Flask(__name__)
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        # Get JSON data from the request
+        data = request.json
+
+        # Convert input data to numpy array
+        input_data = np.array(data["input"]).reshape(1, -1, 1)  # Reshape for LSTM
+
+        # Make prediction
+        prediction = model.predict(input_data)
+
+        # Convert prediction to Python float and return response
+        return jsonify({"prediction": prediction.tolist()})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+if __name__ == '__main__':
+    #app.run(host='0.0.0.0', port=8083)
+    app.run(host='0.0.0.0', port=5000)
+    
+ --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. dockerfile 
+
+FROM python:3.9
+WORKDIR /app
+COPY app.py requirements.txt /app/
+COPY lstm_model.keras /app/lstm_model.keras
+RUN pip install -r requirements.txt
+CMD ["python", "app.py"]
+  
+  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+4. lstm.py 
+
+import numpy as np
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+
+# Example time-series data
+X = np.random.rand(100, 10, 1)  # 100 samples, 10 time steps, 1 feature
+Y = np.random.rand(100, 1)      # Corresponding labels
+
+# Define LSTM model
+model = Sequential([
+    LSTM(50, activation='relu', input_shape=(10, 1)),
+    Dense(1)
+])
+
+model.compile(optimizer='adam', loss='mse')
+model.fit(X, Y, epochs=20)
+
+# Save the model
+model.save('lstm_model.keras')
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+5. 
+  

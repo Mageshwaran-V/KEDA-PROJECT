@@ -1,0 +1,99 @@
+edit the file yaml ...
+
+deployment.yaml 
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compute-1-app
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: compute-1-app
+  template:
+    metadata:
+      labels:
+        app: compute-1-app
+    spec:
+      containers:
+      - name: compute-container
+        image: tcesancr.azurecr.io/mycomputeservice:v2
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: compute-1-service
+spec:
+  selector:
+    app: compute-1-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+edi the file compute-1.py
+
+compute-1.py 
+
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/compute', methods=['GET'])
+def compute():
+    try:
+        a = float(request.args.get('a', 0))
+        b = float(request.args.get('b', 0))
+        c = float(request.args.get('c', 0))
+        result = a * b * c
+        return jsonify({"result": result})
+    except ValueError:
+        return jsonify({"error": "Invalid input"}), 400
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+edi the file dockerfile
+
+
+dockerfile 
+FROM python:3.9
+WORKDIR /app
+COPY compute-1.py requirements.txt /app/
+RUN pip install -r requirements.txt
+CMD ["python", "compute-1.py"]
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+Commands
+
+docker build -t tcesancr.azurecr.io/mycomputeservice:v2 .
+
+docker push tcesancr.azurecr.io/mycomputeservice:v2
+
+kubectl apply -f deployment.yaml
+
+kubectl get pods
+
+kubectl get service
+
+curl "http://20.235.46.163/compute?a=2&b=3&c=4"
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
